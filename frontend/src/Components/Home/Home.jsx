@@ -6,15 +6,35 @@ import {useDispatch, useSelector} from "react-redux";
 import { getAllUsers, getFriendsPosts } from '../../Actions/User';
 import Loader from '../Loader/Loader';
 import { Typography } from '@mui/material';
+import { useAlert } from 'react-alert';
 const Home = () => {
   const dispatch = useDispatch();
+  const alert= useAlert();
   const {loading,posts,error}=useSelector(state=>state.postOfFriends);
   const {users,loading:usersLoading}=useSelector(state=>state.allUsers);
+  const{error:likeError,message} = useSelector((state)=>state.like);
   
 useEffect(() => {
   dispatch(getFriendsPosts());
   dispatch(getAllUsers());
 }, [dispatch]);
+
+useEffect(() => {
+  if(error){
+    alert.error(error);
+    dispatch({type:'clearErrors'});
+
+  }
+  if(likeError){
+    alert.error(likeError);
+    dispatch({type:'clearErrors'});
+
+  }
+  if(message){
+    alert.success(message);
+    dispatch({type:'clearMessage'});
+  }
+ }, [alert,error,message,likeError,dispatch]);
 
 
 
@@ -49,8 +69,8 @@ useEffect(() => {
           
       {users && users.length > 0 ? (
           users.map((user) => (
-            <User
-              
+            <User 
+              key={user._id}
               userId={user._id}
               name={user.name}
               avatar={"http://www.outdoor-photos.com/_photo/2851582.jpg"}//update later using cloudinary

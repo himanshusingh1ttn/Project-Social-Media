@@ -1,5 +1,5 @@
 import { Avatar } from '@mui/material';
-import React from 'react'
+import React ,{useEffect} from "react";
 import {
     MoreVert,
     Favorite,
@@ -9,7 +9,13 @@ import {
   } from "@mui/icons-material";
 import { Link } from 'react-router-dom';
 import { Typography , Button} from '@mui/material';
+import { useDispatch,useSelector} from 'react-redux';
 import "./Post.css";
+import { likePost } from '../../Actions/Post';
+import { getFriendsPosts } from '../../Actions/User';
+
+
+
 const Post = ({
     postId,
     caption,
@@ -24,10 +30,33 @@ const Post = ({
 
 }) => {
     const [liked, setLiked] = React.useState(false);
-    const handleLike = () =>{
+    
+    const dispatch = useDispatch();
+     
+    const {user} = useSelector((state) => state.user);
+
+    const handleLike = async() =>{
         setLiked(!liked);
         //api request
+       await dispatch(likePost(postId));
+        //for uodating the likes
+        if(isAccount){
+           console.log("my account post");
+        }else{
+          dispatch(getFriendsPosts());
+        }
+        
     }
+    useEffect(() => {
+     likes.forEach((item)=>{
+       if(item._id===user._id){
+         setLiked(true);
+       }
+     })
+    }, [likes,user._id]);
+    
+  
+    
   return (
     <div className="post">
       <div className="postHeader">
