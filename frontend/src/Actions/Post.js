@@ -19,3 +19,33 @@ export const likePost =
       });
     }
   };
+
+  export const addCommentOnPost = (id, comment) => async (dispatch) => {
+    try {
+      dispatch({
+        type: "addCommentRequest",
+      });
+  
+      const { data } = await axios.put(
+        `/api/posts/comments/${id}`,  //careful for calling apis form backend
+        
+        {
+          comment,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      dispatch({
+        type: "addCommentSuccess",
+        payload: data.message,
+      });
+    } catch (error) {
+      dispatch({
+        type: "addCommentFailure",
+        payload: error.response.data.message,
+      });
+    }
+  };

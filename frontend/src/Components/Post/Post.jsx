@@ -1,5 +1,5 @@
-import { Avatar } from '@mui/material';
-import React ,{useEffect} from "react";
+import { Avatar,Dialog } from '@mui/material';
+import React ,{useEffect, useState} from "react";
 import {
     MoreVert,
     Favorite,
@@ -11,8 +11,11 @@ import { Link } from 'react-router-dom';
 import { Typography , Button} from '@mui/material';
 import { useDispatch,useSelector} from 'react-redux';
 import "./Post.css";
-import { likePost } from '../../Actions/Post';
+import { addCommentOnPost, likePost } from '../../Actions/Post';
 import { getFriendsPosts } from '../../Actions/User';
+import User from "../User/User";
+import CommentCard from "../CommentCard/CommentCard";
+
 
 
 
@@ -30,6 +33,9 @@ const Post = ({
 
 }) => {
     const [liked, setLiked] = React.useState(false);
+    const[likesUser,setLikesUser] = useState(false);
+    const[commentValue, setCommentValue] = useState("");
+    const [commentToggle, setCommentToggle] = useState(false);
     
     const dispatch = useDispatch();
      
@@ -47,6 +53,16 @@ const Post = ({
         }
         
     }
+    const addCommentHandler = async (e) => {
+      e.preventDefault();
+      await  dispatch(addCommentOnPost(postId, commentValue));
+       if(isAccount){
+       console.log("my account post");
+     }else{
+       dispatch(getFriendsPosts());
+     }
+
+      };
     useEffect(() => {
      likes.forEach((item)=>{
        if(item._id===user._id){
@@ -98,8 +114,8 @@ const Post = ({
           cursor: "pointer",
           margin: "1vmax 2vmax",
         }}
-        // onClick={() => setLikesUser(!likesUser)}
-        // disabled={likes.length === 0 ? true : false}
+        onClick={() => setLikesUser(!likesUser)}
+        disabled={likes.length === 0 ? true : false}
       >
         <Typography>{likes.length} Likes</Typography>
       </button>
@@ -110,16 +126,64 @@ const Post = ({
            }
            
        </Button>
-       <Button>
+       
+       <Button onClick={()=>setCommentToggle(!commentToggle)}> 
            <ChatBubbleOutline/>
        </Button>
+
        <Button>
            {
                isDelete?(<Button><DeleteOutline/></Button>):null
            }
        </Button>
-      </div>
-      </div>
+        </div>
+
+      <Dialog open={likesUser} onClose={()=>setLikesUser(!likesUser)}>
+        <div className="DialogBox">
+          <Typography variant ="h4">
+            Liked By 
+            </Typography>
+            {likes.map(like=>(               
+            <User 
+                key={like._id}
+                userId={like._id}
+                name={like.name}
+                avatar={"http://www.outdoor-photos.com/_photo/2851582.jpg"}//update later using cloudinary
+              />
+            ))
+            }
+       
+        </div>
+      </Dialog>
+      
+    
+      <Dialog open={commentToggle} onClose={()=>setCommentToggle(!commentToggle)}>
+        <div className="DialogBox">
+          <Typography variant ="h4">Comments</Typography>
+           <form className="commentForm" onSubmit={addCommentHandler}>
+             <input  type="text" value={commentValue} onChange={(e)=>setCommentValue(e.target.value)}
+             placeholder="Add Comment" 
+             required
+             
+             />
+               <Button type="submit" variant="contained">
+              Add
+            </Button>
+
+            </form>
+             
+            {
+                        comments.length > 0 ? comments.map((item) => (
+                            <CommentCard
+                            key={item._id}
+                            userId={item.user._id} name={item.user.name} avatar={item.user.avatar} comment={item.comment} commentId={item._id} isAccount={isAccount}
+                            postId={postId} />
+                        )) : <Typography>No Comment Yet</Typography>
+            }
+
+           </div>
+      </Dialog>
+    </div>
      
   )
 }

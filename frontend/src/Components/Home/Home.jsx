@@ -50,8 +50,7 @@ useEffect(() => {
                 <Post 
                 key={post._id}
                 postImage={"http://www.outdoor-photos.com/_photo/2851582.jpg"} 
-                //ownerName={"himanshu1"}
-                //caption="This is a test post"
+                
                 postId={post._id}
                 caption={post.caption}
                 //postImage={post.image.url}
@@ -73,7 +72,7 @@ useEffect(() => {
               key={user._id}
               userId={user._id}
               name={user.name}
-              avatar={"http://www.outdoor-photos.com/_photo/2851582.jpg"}//update later using cloudinary
+              avatar={user.avatar}//update later using cloudinary
             />
           ))
         ) : (
